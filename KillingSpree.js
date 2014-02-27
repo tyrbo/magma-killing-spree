@@ -10,10 +10,15 @@ function On_PlayerKilled(DeathEvent) {
 function On_PlayerConnected(Player) {
   var LastSeen = GetLastSeen(Player.SteamID);
   var TimeStamp = Math.round(Date.now() / 1000);
+  var CurrentSpree = GetCurrentKillingSpree(Player.SteamID);
 
-  if (LastSeen != null && (TimeStamp - LastSeen) > 900) {
-    SetKillingSpree(Player.SteamID, 0);
-    Player.Message("Your killing spree has been reset.");
+  if (LastSeen != null) {
+    if (CurrentSpree > 0) {
+      if ((TimeStamp - LastSeen) >= 900) {
+        SetKillingSpree(Player.SteamID, 0);
+        Player.Message("Your killing spree has been reset.");
+      }
+    }
   }
 }
 
@@ -27,7 +32,7 @@ function GetLastSeen(SteamID) {
 }
 
 function SetLastSeen(SteamID, LastSeen) {
-  Data.SetTableValue("Peak_KS_LastSeen", SteamID, LastSeen);
+  Data.AddTableValue("Peak_KS_LastSeen", SteamID, LastSeen);
 }
 
 function GetCurrentKillingSpree(SteamID) {
