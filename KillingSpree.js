@@ -1,17 +1,37 @@
-// Killing Spree Plugin
-// By Peak
-
 function On_PlayerKilled(DeathEvent) {
   if (DeathEvent.Attacker.SteamID != DeathEvent.Victim.SteamID) {
     var CurrentSpree = GetCurrentKillingSpree(DeathEvent.Attacker.SteamID) + 1;
     SetKillingSpree(DeathEvent.Victim.SteamID, 0);
     SetKillingSpree(DeathEvent.Attacker.SteamID, CurrentSpree);
-    ShowKillingSpreeNotification(CurrentSpree, DeathEvent.Attacker.Name)
+    ShowKillingSpreeNotification(DeathEvent.Attacker.Name, CurrentSpree)
   }
 }
 
+function On_PlayerConnected(Player) {
+  var LastSeen = GetLastSeen(Player.SteamID);
+  var TimeStamp = Math.round(Date.now() / 1000);
+
+  if (LastSeen != null && (TimeStamp - LastSeen) > 900) {
+    SetKillingSpree(Player.SteamID, 0);
+    Player.Message("Your killing spree has been reset.");
+  }
+}
+
+function On_PlayerDisconnected(Player) {
+  var TimeStamp = Math.round(Date.now() / 1000);
+  SetLastSeen(Player.SteamID, TimeStamp);
+}
+
+function GetLastSeen(SteamID) {
+  return Data.GetTableValue("Peak_KS_LastSeen", SteamID);
+}
+
+function SetLastSeen(SteamID, LastSeen) {
+  Data.SetTableValue("Peak_KS_LastSeen", SteamID, LastSeen);
+}
+
 function GetCurrentKillingSpree(SteamID) {
-  var KillingSpree = Data.GetTableValue("killingspree", SteamID);
+  var KillingSpree = Data.GetTableValue("Peak_KS_CurrentSpree", SteamID);
 
   if (KillingSpree == null) {
     return 0;
@@ -21,10 +41,10 @@ function GetCurrentKillingSpree(SteamID) {
 }
 
 function SetKillingSpree(SteamID, Spree) {
-  return Data.AddTableValue("killingspree", SteamID, Spree);
+  return Data.AddTableValue("Peak_KS_CurrentSpree", SteamID, Spree);
 }
 
-function ShowKillingSpreeNotification(CurrentSpree, Name) {
+function ShowKillingSpreeNotification(Name, CurrentSpree) {
   if (CurrentSpree == 5) {
     Server.BroadcastNotice(Name + " is on a killing spree!");
   } else if (CurrentSpree == 10) {

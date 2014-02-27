@@ -1,0 +1,9 @@
+Killing Spree
+Change Log
+
+0.0.2
+- Renamed the tables to avoid any naming conflicts with future plugins.
+- Killing sprees should now expire after a 15 minute disconnect.
+
+0.0.1
+- Initial release
