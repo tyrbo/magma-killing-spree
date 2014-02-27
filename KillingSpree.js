@@ -9,11 +9,11 @@ function On_PlayerKilled(DeathEvent) {
 
 function On_PlayerConnected(Player) {
   var LastSeen = GetLastSeen(Player.SteamID);
-  var TimeStamp = Math.round(Date.now() / 1000);
-  var CurrentSpree = GetCurrentKillingSpree(Player.SteamID);
 
   if (LastSeen != null) {
+    var CurrentSpree = GetCurrentKillingSpree(Player.SteamID);
     if (CurrentSpree > 0) {
+      var TimeStamp = Math.round(Date.now() / 1000);
       if ((TimeStamp - LastSeen) >= 900) {
         SetKillingSpree(Player.SteamID, 0);
         Player.Message("Your killing spree has been reset.");
